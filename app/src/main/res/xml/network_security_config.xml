@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Allows plain-text HTTP. The Contact Directory server runs over HTTP on your
+  LAN (e.g. http://192.168.x.x:8080), and Android blocks cleartext by default on
+  API 28+. This is fine for a personal app talking to your own laptop; for a
+  real/public deployment use HTTPS and remove this.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>

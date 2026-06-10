@@ -1,0 +1,15 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Simple person glyph centred in the adaptive-icon safe zone. -->
+    <group android:scaleX="2.2" android:scaleY="2.2" android:translateX="29.5" android:translateY="29.5">
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M12,12m-5,0a5,5 0,1 1,10 0a5,5 0,1 1,-10 0" />
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M12,14c-4.4,0 -8,2.2 -8,5v1h16v-1c0,-2.8 -3.6,-5 -8,-5z" />
+    </group>
+</vector>

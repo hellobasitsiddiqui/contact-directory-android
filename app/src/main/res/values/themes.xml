@@ -1,0 +1,5 @@
+<resources>
+    <!-- A no-action-bar framework theme; the UI itself is drawn by Compose
+         MaterialTheme. Using a framework theme avoids an extra dependency. -->
+    <style name="Theme.ContactDirectory" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>
