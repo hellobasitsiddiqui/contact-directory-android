@@ -6,6 +6,8 @@ name: Build APK
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - '**.md'   # doc-only changes don't need an APK rebuild
   workflow_dispatch:
 
 permissions:
