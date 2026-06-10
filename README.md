@@ -1,8 +1,16 @@
-# Contact Directory — Android (login + welcome)
+# Contact Directory — Android
 
-A minimal native Android client for the [Contact Directory](https://github.com/hellobasitsiddiqui/contact-directory)
-API: a **login screen** (with an editable server URL) → a **welcome screen**. Kotlin + Jetpack
-Compose; one API call (`POST /api/v1/auth/login`). No server changes required.
+A native Android client (Kotlin + Jetpack Compose) for the
+[Contact Directory](https://github.com/hellobasitsiddiqui/contact-directory) API. No server changes
+required.
+
+**Features:** login (with an editable server URL) · contacts list with **search** + pagination ·
+**favourite** toggle · contact **detail** (tap-to-call / tap-to-email) · **create / edit / delete** ·
+**Trash** (restore / delete forever) · **profile** + **change password** · **logout**. Sessions use the
+short-lived access token with **silent refresh** on `401` (mirrors the web app).
+
+Not included yet: photo upload/display, CSV import/export, bulk multi-select, and admin
+(user-management / audit) screens.
 
 ## Get the APK (no Android tooling needed)
 GitHub Actions builds the APK for you. After this repo is pushed:
