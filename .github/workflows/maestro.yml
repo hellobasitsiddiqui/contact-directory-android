@@ -33,23 +33,22 @@ jobs:
       - name: Build the APKs (native + webview)
         run: gradle :app:assembleDebug :webview:assembleDebug --no-daemon
 
-      # Backend (Spring Boot) on :8080, H2 default profile. The emulator reaches it via 10.0.2.2.
-      - name: Check out the backend
-        uses: actions/checkout@v4
-        with:
-          repository: hellobasitsiddiqui/contact-directory
-          path: backend
-
-      - name: Boot the backend
-        working-directory: backend
+      # Backend on :8080 (H2 default). The emulator reaches it via 10.0.2.2.
+      # Download the backend's released JAR and run it with JDK 21 (the backend
+      # targets Java 21; this job's default JDK is 17 for the Android build).
+      - name: Boot the backend (released JAR)
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          ./mvnw -q -DskipTests package
-          nohup java -jar target/*.jar > /tmp/backend.log 2>&1 &
+          TAG=$(gh release list --repo hellobasitsiddiqui/contact-directory --limit 1 --json tagName -q '.[0].tagName')
+          echo "backend release: $TAG"
+          gh release download "$TAG" --repo hellobasitsiddiqui/contact-directory --pattern '*.jar' --dir backend-jar
+          nohup "$JAVA_HOME_21_X64/bin/java" -jar backend-jar/*.jar > /tmp/backend.log 2>&1 &
           echo "waiting for backend health..."
           for i in $(seq 1 60); do
             curl -sf http://localhost:8080/actuator/health && break || sleep 3
           done
-          curl -sf http://localhost:8080/actuator/health || (echo "backend did not start"; tail -50 /tmp/backend.log; exit 1)
+          curl -sf http://localhost:8080/actuator/health || (echo "backend did not start"; tail -60 /tmp/backend.log; exit 1)
 
       - name: Run Maestro flow on an emulator
         uses: reactivecircus/android-emulator-runner@v2
