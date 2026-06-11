@@ -49,15 +49,13 @@ jobs:
           path: out/*.apk
 
       - name: Publish APKs to the "latest" release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: latest
-          name: Latest APKs
-          prerelease: true
-          files: out/*.apk
-          body: >
-            Debug builds of the Contact Directory Android apps. Download and install
-            on your phone (allow installing from unknown sources):
-            • `contact-directory.apk` — native Compose client.
-            • `contact-directory-webview.apk` — thin WebView wrapper of the web app
-            (set the server URL in the address bar at the top).
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          REPO="${{ github.repository }}"
+          NOTES=$'Debug builds of the Contact Directory Android apps. Install via "unknown sources":\n• contact-directory.apk — native Compose client.\n• contact-directory-webview.apk — thin WebView wrapper (set the server URL in the address bar).'
+          # Idempotent: create the rolling release if missing, then overwrite its assets.
+          if ! gh release view latest --repo "$REPO" >/dev/null 2>&1; then
+            gh release create latest --repo "$REPO" --prerelease --title "Latest APKs" --notes "$NOTES" --target "$GITHUB_SHA"
+          fi
+          gh release upload latest out/contact-directory.apk out/contact-directory-webview.apk --repo "$REPO" --clobber
