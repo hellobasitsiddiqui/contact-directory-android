@@ -1,0 +1,77 @@
+name: Maestro UI tests
+
+# End-to-end UI tests with screenshots (the mobile equivalent of the web Playwright
+# e2e). Boots the backend, starts an emulator, installs the app, runs the Maestro
+# flow, and uploads the screenshots as an artifact.
+#
+# Manual-only: emulator + backend orchestration is slow and best-effort; run it on
+# demand rather than on every push.
+on:
+  workflow_dispatch:
+
+jobs:
+  maestro:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Build the app APK
+        run: gradle :app:assembleDebug --no-daemon
+
+      # Backend (Spring Boot) on :8080, H2 default profile. The emulator reaches it via 10.0.2.2.
+      - name: Check out the backend
+        uses: actions/checkout@v4
+        with:
+          repository: hellobasitsiddiqui/contact-directory
+          path: backend
+
+      - name: Boot the backend
+        working-directory: backend
+        run: |
+          ./mvnw -q -DskipTests package
+          nohup java -jar target/*.jar > /tmp/backend.log 2>&1 &
+          echo "waiting for backend health..."
+          for i in $(seq 1 60); do
+            curl -sf http://localhost:8080/actuator/health && break || sleep 3
+          done
+          curl -sf http://localhost:8080/actuator/health || (echo "backend did not start"; tail -50 /tmp/backend.log; exit 1)
+
+      - name: Run Maestro flow on an emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          target: google_apis
+          force-avd-creation: false
+          emulator-options: -no-snapshot -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          disable-animations: true
+          script: |
+            curl -Ls "https://get.maestro.mobile.dev" | bash
+            export PATH="$PATH:$HOME/.maestro/bin"
+            adb install -r app/build/outputs/apk/debug/app-debug.apk
+            mkdir -p maestro-out
+            cd maestro-out
+            maestro test ../maestro/smoke.yaml
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maestro-screenshots
+          path: maestro-out/*.png
+          if-no-files-found: warn

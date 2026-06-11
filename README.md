@@ -12,6 +12,20 @@ short-lived access token with **silent refresh** on `401` (mirrors the web app).
 Not included yet: photo upload/display, CSV import/export, bulk multi-select, and admin
 (user-management / audit) screens.
 
+## Two apps in this repo
+- **`:app`** — the **native** Kotlin/Compose client (above) → `contact-directory.apk`.
+- **`:webview`** — a thin **WebView wrapper**: the same web UI loaded in a `WebView`, with an address
+  bar to point it at your server (handles the changing LAN IP) → `contact-directory-webview.apk`.
+  Lowest-effort cross-surface option; reuses the web app verbatim so it's always in sync.
+
+Both APKs are built by CI and attached to the **`latest`** release.
+
+## UI testing (Maestro)
+`maestro/` holds [Maestro](https://maestro.mobile.dev/) flows (the "Playwright for mobile") that drive
+the real app and take screenshots. Run locally with `maestro test maestro/smoke.yaml`, or via the
+manual **Maestro UI tests** GitHub Action (boots the backend + an emulator, runs the flow, uploads
+screenshots). See [`maestro/README.md`](maestro/README.md).
+
 ## Get the APK (no Android tooling needed)
 GitHub Actions builds the APK for you. After this repo is pushed:
 

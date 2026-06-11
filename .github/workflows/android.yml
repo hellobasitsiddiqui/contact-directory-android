@@ -1,8 +1,8 @@
 name: Build APK
 
-# Builds a debug APK and publishes it to a "latest" pre-release so you can
-# download and install it directly on your phone. Runs on every push to main
-# and on demand.
+# Builds the debug APKs for BOTH apps — the native Compose client (:app) and the
+# thin WebView wrapper (:webview) — and publishes them to a "latest" pre-release
+# so you can download and install them on your phone. Runs on push to main and on demand.
 on:
   push:
     branches: [main]
@@ -33,28 +33,31 @@ jobs:
         with:
           gradle-version: '8.7'
 
-      - name: Build debug APK
-        run: gradle :app:assembleDebug --no-daemon --stacktrace
+      - name: Build debug APKs (native + webview)
+        run: gradle :app:assembleDebug :webview:assembleDebug --no-daemon --stacktrace
 
-      - name: Rename APK
+      - name: Collect APKs
         run: |
           mkdir -p out
           cp app/build/outputs/apk/debug/app-debug.apk out/contact-directory.apk
+          cp webview/build/outputs/apk/debug/webview-debug.apk out/contact-directory-webview.apk
 
-      - name: Upload APK as a workflow artifact
+      - name: Upload APKs as workflow artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: contact-directory-apk
-          path: out/contact-directory.apk
+          name: contact-directory-apks
+          path: out/*.apk
 
-      - name: Publish APK to the "latest" release
+      - name: Publish APKs to the "latest" release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: latest
-          name: Latest APK
+          name: Latest APKs
           prerelease: true
-          files: out/contact-directory.apk
+          files: out/*.apk
           body: >
-            Debug build of the Contact Directory Android app (login + welcome).
-            Download `contact-directory.apk` below and install it on your phone
-            (you'll need to allow installing from unknown sources).
+            Debug builds of the Contact Directory Android apps. Download and install
+            on your phone (allow installing from unknown sources):
+            • `contact-directory.apk` — native Compose client.
+            • `contact-directory-webview.apk` — thin WebView wrapper of the web app
+            (set the server URL in the address bar at the top).

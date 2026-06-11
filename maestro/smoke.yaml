@@ -1,0 +1,46 @@
+# Maestro smoke flow for the native Compose app — drives the real UI and saves a
+# screenshot at each step (the mobile equivalent of the web Playwright e2e).
+#
+# Run locally against a running emulator + backend:
+#   maestro test maestro/smoke.yaml
+# (screenshots are written as <name>.png in the working directory.)
+#
+# The login screen pre-fills the Server URL with http://10.0.2.2:8080 — the
+# emulator's alias for the host — so no URL typing is needed when the backend
+# runs on the same machine.
+appId: com.example.contactdirectory
+---
+- launchApp:
+    clearState: true
+- assertVisible: "Contact Directory"
+- takeScreenshot: 01-login
+
+- tapOn: "Username"
+- inputText: "admin"
+- tapOn: "Password"
+- inputText: "admin123"
+- hideKeyboard
+- tapOn: "Sign in"
+
+# Landed on the contacts list
+- assertVisible: "Contacts"
+- takeScreenshot: 02-contacts
+
+# Search
+- tapOn: "Search"
+- inputText: "a"
+- pressKey: Enter
+- hideKeyboard
+- takeScreenshot: 03-search
+
+# Profile
+- tapOn: "Profile"
+- assertVisible: "My Profile"
+- takeScreenshot: 04-profile
+
+# Back to contacts, open the new-contact form
+- back
+- assertVisible: "Contacts"
+- tapOn: "+ New"
+- assertVisible: "New contact"
+- takeScreenshot: 05-new-contact

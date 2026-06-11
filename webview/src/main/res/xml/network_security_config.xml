@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Allows plain-text HTTP so the WebView can load the server over your LAN
+     (http://192.168.x.x:8080). Use HTTPS for a real deployment and remove this. -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>
