@@ -34,6 +34,23 @@ import com.example.contactdirectory.ui.Navigator
 import com.example.contactdirectory.ui.errorMessage
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+
+/**
+ * Formats the server's ISO-8601 timestamp (e.g. "2026-06-11T12:54:25.160303Z")
+ * as a friendly local date like "11 Jun 2026". Falls back to the raw string if
+ * it can't be parsed, so a format change server-side never blanks the field.
+ */
+private val MEMBER_SINCE_FORMAT: DateTimeFormatter =
+    DateTimeFormatter.ofPattern("d MMM yyyy", Locale.getDefault())
+
+private fun formatMemberSince(iso: String): String =
+    runCatching {
+        Instant.parse(iso).atZone(ZoneId.systemDefault()).format(MEMBER_SINCE_FORMAT)
+    }.getOrDefault(iso)
 
 @Composable
 fun ProfileScreen(nav: Navigator) {
@@ -97,7 +114,7 @@ fun ProfileScreen(nav: Navigator) {
         ) {
             Text(username, style = MaterialTheme.typography.headlineSmall)
             Text("Role: $role")
-            createdAt?.let { Text("Member since: $it") }
+            createdAt?.let { Text("Member since: ${formatMemberSince(it)}") }
 
             Spacer(Modifier.height(20.dp))
             Divider()
