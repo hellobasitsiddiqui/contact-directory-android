@@ -20,10 +20,15 @@ Not included yet: photo upload/display, CSV import/export, bulk multi-select, an
 
 Both APKs are built by CI and attached to the **`latest`** release.
 
+## Screenshots
+See the [screenshot gallery](docs/screenshots/README.md) — captured automatically on a CI emulator
+by the Maestro flows (native app + WebView wrapper).
+
 ## UI testing (Maestro)
 `maestro/` holds [Maestro](https://maestro.mobile.dev/) flows (the "Playwright for mobile") that drive
-the real app and take screenshots. Run locally with `maestro test maestro/smoke.yaml`, or via the
-manual **Maestro UI tests** GitHub Action (boots the backend + an emulator, runs the flow, uploads
+the real apps and take screenshots. Run locally with `maestro test maestro/smoke.yaml`, or via the
+manual **Maestro UI tests** GitHub Action (boots the backend + an emulator, runs both flows —
+`smoke.yaml` for the native app, `webview-smoke.yaml` for the WebView wrapper — and uploads
 screenshots). See [`maestro/README.md`](maestro/README.md).
 
 ## Get the APK (no Android tooling needed)
@@ -40,7 +45,7 @@ The phone talks to the Spring Boot app on your laptop over Wi-Fi.
 
 1. Start the app **bound to all interfaces** (not the loopback-only Docker stack):
    ```bash
-   cd ../Fahad           # the contact-directory backend
+   cd ../contact-directory   # or wherever you cloned the backend repo
    ./mvnw spring-boot:run
    ```
    This binds `0.0.0.0:8080`, so it's reachable on the LAN. (The `docker compose`
@@ -58,8 +63,8 @@ The phone talks to the Spring Boot app on your laptop over Wi-Fi.
 ## Notes
 - The app permits **cleartext HTTP** (`network_security_config.xml`) because the server runs over HTTP
   on your LAN. For a real/public deployment, use HTTPS and remove that.
-- The access token is kept in plain `SharedPreferences` — fine for a personal demo; a production app
-  would use `EncryptedSharedPreferences` and add refresh-token handling.
+- The tokens (access + rotating refresh token) are kept in plain `SharedPreferences` — fine for a
+  personal demo; a production app would use `EncryptedSharedPreferences`/Keystore.
 - The server URL is saved on-device, so you only type it once (re-enter it if your laptop's IP changes).
 
 ## Build locally instead (optional)

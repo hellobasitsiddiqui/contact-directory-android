@@ -1,8 +1,9 @@
 name: Maestro UI tests
 
 # End-to-end UI tests with screenshots (the mobile equivalent of the web Playwright
-# e2e). Boots the backend, starts an emulator, installs the app, runs the Maestro
-# flow, and uploads the screenshots as an artifact.
+# e2e). Boots the backend (latest released JAR), starts a KVM-accelerated emulator,
+# installs both apps (native + webview), runs both Maestro flows, and uploads the
+# screenshots as an artifact.
 #
 # Manual-only: emulator + backend orchestration is slow and best-effort; run it on
 # demand rather than on every push.

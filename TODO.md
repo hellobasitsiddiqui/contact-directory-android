@@ -16,8 +16,9 @@
 - [ ] **Bulk** multi-select actions (delete / favourite / tag).
 - [ ] **Admin** screens — user management + audit log (admin-only).
 - [ ] Move tokens to **EncryptedSharedPreferences** (currently plain prefs — fine for a personal demo).
-- [ ] **HTTPS**: when the server is deployed behind TLS (backend CD-025/CD-027), drop the cleartext
-  network-security-config.
+- [ ] **HTTPS**: when the server is actually deployed behind TLS, drop the cleartext
+  network-security-config. (The backend is already TLS-*ready* as of v1.0.0-beta.3 — CD-027 done;
+  what's pending is the real deployment, backend CD-025.)
 
 ## Nice-to-have
 - [ ] Pull-to-refresh on the contacts list.

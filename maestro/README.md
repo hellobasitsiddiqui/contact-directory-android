@@ -7,7 +7,8 @@ to a future iOS build.
 ## Run locally
 1. Install Maestro: `curl -Ls https://get.maestro.mobile.dev | bash`
 2. Start the **backend** (reachable from the emulator at `10.0.2.2`):
-   `cd ../Fahad && ./mvnw spring-boot:run`
+   `cd ../contact-directory && ./mvnw spring-boot:run` — the backend repo:
+   [hellobasitsiddiqui/contact-directory](https://github.com/hellobasitsiddiqui/contact-directory)
 3. Start an **emulator** and install the app APK (`adb install …/app-debug.apk`).
 4. Run a flow (screenshots are written to the working directory):
    ```bash
@@ -16,11 +17,16 @@ to a future iOS build.
    Or explore interactively: `maestro studio`.
 
 ## In CI
-`.github/workflows/maestro.yml` (manual `workflow_dispatch`) boots the backend, starts an emulator,
-installs the APK, runs `smoke.yaml`, and uploads the screenshots as a `maestro-screenshots` artifact —
-mirroring the web Playwright e2e pipeline. The emulator + backend orchestration is the fiddly part; if
-selectors or timing need tweaking on the first real run, adjust `smoke.yaml` (text matchers) or the
-workflow waits.
+`.github/workflows/maestro.yml` (manual `workflow_dispatch`) boots the backend **from its latest
+released JAR** (with JDK 21 — the job's default JDK is 17 for the Android build), starts a
+**KVM-accelerated** emulator, installs **both APKs** (native + webview), runs **both flows**
+(`smoke.yaml` and `webview-smoke.yaml`), and uploads the screenshots as a `maestro-screenshots`
+artifact — mirroring the web Playwright e2e pipeline. The workflow is verified working end-to-end
+(the committed [screenshot gallery](../docs/screenshots/README.md) came from it). If a label changes
+in the app, update the text matchers in the flow YAMLs.
+
+The native flow signs in as **alice/alice123** (a seeded user who owns contacts — the seeded admin
+deliberately owns none, so its list would screenshot empty).
 
 ## Notes
 - Selectors match **visible text** (e.g. "Sign in", "Username", "Contacts"). If a label changes, update
