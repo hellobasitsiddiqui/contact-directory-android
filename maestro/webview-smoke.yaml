@@ -1,0 +1,15 @@
+# Maestro flow for the WebView wrapper app — loads the web UI inside the WebView
+# and screenshots it. Best-effort interaction with the in-WebView form.
+#
+# The address bar is pre-filled with http://10.0.2.2:8080 (emulator -> host), so
+# tapping "Go" loads the login page served by the backend.
+appId: com.example.contactdirectory.webview
+---
+- launchApp:
+    clearState: true
+- takeScreenshot: webview-01-address-bar
+- tapOn: "Go"
+- extendedWaitUntil:
+    visible: "Contact Directory"
+    timeout: 20000
+- takeScreenshot: webview-02-web-login
