@@ -50,7 +50,16 @@ jobs:
           done
           curl -sf http://localhost:8080/actuator/health || (echo "backend did not start"; tail -60 /tmp/backend.log; exit 1)
 
-      - name: Run Maestro flow on an emulator
+      # Without KVM the emulator runs in slow software mode (~6 min boot) and is
+      # unstable — the first run died with a "Broken pipe" right after boot.
+      # Granting KVM access gives hardware acceleration: fast (~1 min) and stable.
+      - name: Enable KVM hardware acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Run Maestro flows on an emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 30
@@ -66,8 +75,12 @@ jobs:
             adb install -r webview/build/outputs/apk/debug/webview-debug.apk
             mkdir -p maestro-out
             cd maestro-out
-            maestro test ../maestro/smoke.yaml
-            maestro test ../maestro/webview-smoke.yaml
+            # Run both flows; collect all screenshots even if one flow fails,
+            # but still surface a non-zero exit so a real break shows up red.
+            rc=0
+            maestro test ../maestro/smoke.yaml || rc=1
+            maestro test ../maestro/webview-smoke.yaml || rc=1
+            exit $rc
 
       - name: Upload screenshots
         if: always()
