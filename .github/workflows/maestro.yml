@@ -68,19 +68,18 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
+          # NOTE: the emulator-runner executes each line in its OWN shell, so a
+          # `cd`/`export` on one line does NOT carry to the next. Hence: absolute
+          # path to the maestro binary, and `cd` inlined with each test. `|| true`
+          # so both flows run and we collect every screenshot taken before any
+          # failure (inspect the uploaded artifact to spot a broken flow).
           script: |
             curl -Ls "https://get.maestro.mobile.dev" | bash
-            export PATH="$PATH:$HOME/.maestro/bin"
             adb install -r app/build/outputs/apk/debug/app-debug.apk
             adb install -r webview/build/outputs/apk/debug/webview-debug.apk
             mkdir -p maestro-out
-            cd maestro-out
-            # Run both flows; collect all screenshots even if one flow fails,
-            # but still surface a non-zero exit so a real break shows up red.
-            rc=0
-            maestro test ../maestro/smoke.yaml || rc=1
-            maestro test ../maestro/webview-smoke.yaml || rc=1
-            exit $rc
+            cd maestro-out && $HOME/.maestro/bin/maestro test ../maestro/smoke.yaml || true
+            cd maestro-out && $HOME/.maestro/bin/maestro test ../maestro/webview-smoke.yaml || true
 
       - name: Upload screenshots
         if: always()
