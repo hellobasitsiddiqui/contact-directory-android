@@ -15,22 +15,31 @@ appId: com.example.contactdirectory
 - assertVisible: "Contact Directory"
 - takeScreenshot: 01-login
 
+# Log in as a seeded user that OWNS contacts (admin deliberately owns none, so
+# its list would render empty). alice owns Jane Doe + John Smith.
 - tapOn: "Username"
-- inputText: "admin"
+- inputText: "alice"
 - tapOn: "Password"
-- inputText: "admin123"
+- inputText: "alice123"
 - hideKeyboard
 - tapOn: "Sign in"
 
-# Landed on the contacts list
+# Landed on the contacts list — wait for a seeded contact to render (not the
+# loading/empty state) before screenshotting.
 - assertVisible: "Contacts"
+- extendedWaitUntil:
+    visible: "Doe"
+    timeout: 15000
 - takeScreenshot: 02-contacts
 
-# Search
+# Search — filter to a single contact, then wait for the non-matching one to go.
 - tapOn: "Search"
-- inputText: "a"
+- inputText: "Jane"
 - pressKey: Enter
 - hideKeyboard
+- extendedWaitUntil:
+    visible: "Jane"
+    timeout: 10000
 - takeScreenshot: 03-search
 
 # Profile
