@@ -7,6 +7,9 @@ appId: com.example.contactdirectory.webview
 ---
 - launchApp:
     clearState: true
+# Wait for the wrapper's own UI (address bar + Go button) to render before the
+# first screenshot — otherwise it captures the previous flow's leftover screen.
+- assertVisible: "Go"
 - takeScreenshot: webview-01-address-bar
 - tapOn: "Go"
 - extendedWaitUntil:
